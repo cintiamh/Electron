@@ -310,3 +310,168 @@ Include app.js into index.html
 ```
 
 You can run the build and in the menu select View > Toggle Developer Tools to check out the console.logs.
+
+```
+$ npm install async --save
+```
+
+And update app.js:
+```javascript
+'use strict';
+
+const async = require('async');
+const fs = require('fs');
+const osenv = require('osenv');
+const path = require('path');
+
+function getUserHomeFolder() {
+  return osenv.home();
+}
+function getFilesInFolder(folderPath, cb) {
+  fs.readdir(folderPath, cb);
+}
+function inspectAndDescribeFile(filePath, cb) {
+  let result = {
+    file: path.basename(filePath),
+    path: filePath,
+    type: ''
+  };
+  fs.stat(filePath, (err, stat) => {
+    if (err) {
+      cb(err);
+    } else {
+      if (stat.isFile()) {
+        result.type = 'file';
+      }
+      if (stat.isDirectory()) {
+        result.type = 'directory';
+      }
+      cb(err, result);
+    }
+  });
+}
+function inspectAndDescribeFiles(folderPath, files, cb) {
+  async.map(files, (file, asyncCb) => {
+    let resolvedFilePath = path.resolve(folderPath, file);
+    inspectAndDescribeFile(resolvedFilePath, asyncCb);
+  }, cb);
+}
+function displayFiles(err, files) {
+  if (err) {
+    return aler('Sorry, we could not display your files');
+  }
+  files.forEach((file) => {
+    console.log(file);
+  });
+}
+function main() {
+  const folderPath = getUserHomeFolder();
+  getFilesInFolder(folderPath, (err, files) => {
+    if (err) {
+      return alert('Sorry, we could not load your home folder');
+    }
+    inspectAndDescribeFiles(folderPath, files, displayFiles);
+  });
+}
+
+main();
+```
+
+Now we should have some objects displaying on console.log().
+
+##### Visually displaying the files and folders
+
+You'll use an HTML template for each file and then render an instance of that template to the UI.
+
+Download images for file and directory:
+* https://openclipart.org/detail/137155/folder-icon
+* https://openclipart.org/detail/83893/file-icon
+
+Include template and main area on html file:
+```html
+<html>
+  <body>
+    <template id="item-template">
+      <div class="item">
+        <img class="icon" />
+        <div class="filename"></div>
+      </div>
+    </template>
+    <div id="toolbar">
+      <!-- ... -->
+    </div>
+    <div id="main-area"></div>
+  </body>
+</html>
+```
+
+Include css styles for the folder and files:
+```css
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Helvetica','Arial','sans';
+}
+
+#toolbar {
+  top: 0px;
+  position: fixed;
+  background: red;
+  width: 100%;
+  z-index: 2;
+}
+
+#current-folder {
+  float: left;
+  color: white;
+  background: rgba(0,0,0,0.2);
+  padding: 0.5em 1em;
+  min-width: 10em;
+  border-radius: 0.2em;
+  margin: 1em;
+}
+
+#main-area {
+  clear: both;
+  margin: 2em;
+  margin-top: 3em;
+  z-index: 1;
+}
+
+.item {
+  position: relative;
+  float: left;
+  padding: 1em;
+  margin: 1em;
+  width: 6em;
+  height: 6em;
+  text-align: center;
+}
+
+.item .filename {
+  padding: 1em;
+  font-size: 10pt;
+}
+```
+
+And the app.js content:
+```javascript
+'use strict';
+// ...
+function displayFile(file) {
+  const mainArea = document.getElementById('main-area');
+  const template = document.querySelector('#item-template');
+  let clone = document.importNode(template.content, true);
+  clone.querySelector('img').src = `images/${file.type}.svg`;
+  clone.querySelector('.filename').innerText = file.file;
+  mainArea.appendChild(clone);
+}
+function displayFiles(err, files) {
+  if (err) {
+    return aler('Sorry, we could not display your files');
+  }
+  files.forEach(displayFile);
+}
+// ...
+main();
+```
