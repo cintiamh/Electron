@@ -138,3 +138,117 @@ And include in package.json:
   "build": "electron ."
 },
 ```
+
+lorikeet/index.js
+```javascript
+'use strict';
+
+const electron = require('electron');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
+
+let mainWindow = null;
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('ready', () => {
+  mainWindow = new BrowserWindow();
+  mainWindow.loadURL(`file://${app.getAppPath()}/index.html`);
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+});
+```
+
+lorikeet/index.html
+```html
+<html>
+  <head>
+    <title>Lorikeet</title>
+  </head>
+  <body>
+    <h1>Welcome to Lorikeet</h1>
+  </body>
+</html>
+```
+
+And then run:
+```
+$ npm run build
+```
+
+#### Displaying the user's personal folder in the toolbar
+
+```
+$ touch app.css
+```
+
+lorikeet/app.cs
+```css
+body {
+     padding: 0;
+     margin: 0;
+     font-family: 'Helvetica','Arial','sans';
+}
+
+#toolbar {
+     position: absolute;
+     background: red;
+     width: 100%;
+     padding: 1em;
+}
+
+#current-folder {
+     float: left;
+     color: white;
+     background: rgba(0,0,0,0.2);
+     padding: 0.5em 1em;
+     min-width: 10em;
+     border-radius: 0.2em;
+}
+```
+
+lorikeet/index.html
+```html
+<html>
+  <head>
+    <title>Lorikeet</title>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div id="toolbar">
+      <div id="current-folder"></div>
+    </div>
+  </body>
+</html>
+```
+
+##### Discovering the user's personal folder with Node.js
+
+```
+$ npm i osenv --save
+```
+
+With the osenv module installed, you now want to load the user's personal folder and display it in the personal folder UI element in index.html file.
+
+```html
+<html>
+  <head>
+    <title>Lorikeet</title>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div id="toolbar">
+      <div id="current-folder">
+        <script>
+          document.write(require('osenv').home());
+        </script>
+      </div>
+    </div>
+  </body>
+</html>
+```

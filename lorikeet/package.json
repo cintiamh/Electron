@@ -12,5 +12,8 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^1.7.5"
+  },
+  "dependencies": {
+    "osenv": "^0.1.4"
   }
 }
