@@ -252,3 +252,61 @@ With the osenv module installed, you now want to load the user's personal folder
   </body>
 </html>
 ```
+
+#### Showing user's files and folders in the UI
+
+```
+$ touch app.js
+```
+
+Content for app.js:
+```javascript
+'use strict';
+
+const osenv = require('osenv');
+const fs = require('fs');
+
+function getUserHomeFolder() {
+  return osenv.home();
+}
+
+function getFilesInFolder(folderPath, cb) {
+  fs.readdir(folderPath, cb);
+}
+
+function main() {
+  const folderPath = getUserHomeFolder();
+  getFilesInFolder(folderPath, (err, files) => {
+    if (err) {
+      return alert('Sorry, we could not load your home folder');
+    }
+    files.forEach((file) => {
+      console.log(`${folderPath}/${file}`);
+    });
+  });
+}
+
+main();
+```
+
+Include app.js into index.html
+```html
+<html>
+  <head>
+    <title>Lorikeet</title>
+    <link rel="stylesheet" href="app.css" />
+    <script src="app.js"></script>
+  </head>
+  <body>
+    <div id="toolbar">
+      <div id="current-folder">
+        <script>
+          document.write(getUserHomeFolder());
+        </script>
+      </div>
+    </div>
+  </body>
+</html>
+```
+
+You can run the build and in the menu select View > Toggle Developer Tools to check out the console.logs.
