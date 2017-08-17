@@ -468,10 +468,163 @@ function displayFile(file) {
 }
 function displayFiles(err, files) {
   if (err) {
-    return aler('Sorry, we could not display your files');
+    return alert('Sorry, we could not display your files');
   }
   files.forEach(displayFile);
 }
 // ...
 main();
 ```
+
+## Building your first desktop application
+
+### Exploring the folders
+
+#### Refactoring the code
+
+We can break app.js into smaller parts:
+
+* app.js
+* fileSystem.js
+* userInterface.js
+
+```
+$ touch fileSystem.js
+$ touch userInterface.js
+```
+
+fileSystem.js:
+```javascript
+'use strict';
+
+const async = require('async');
+const fs = require('fs');
+const osenv = require('osenv');
+const path = require('path');
+
+function getUserHomeFolder() {
+  return osenv.home();
+}
+
+function getFilesInFolder(folderPath, cb) {
+  fs.readdir(folderPath, cb);
+}
+
+function inspectAndDescribeFile(filePath, cb) {
+  let result = {
+    file: path.basename(filePath),
+    path: filePath,
+    type: ''
+  };
+  fs.stat(filePath, (err, stat) => {
+    if (err) {
+      cb(err);
+    } else {
+      if (stat.isFile()) {
+        result.type = 'file';
+      }
+      if (stat.isDirectory()) {
+        result.type = 'directory';
+      }
+      cb(err, result);
+    }
+  });
+}
+
+function inspectAndDescribeFiles(folderPath, files, cb) {
+  async.map(files, (file, asyncCb) => {
+    let resolvedFilePath = path.resolve(folderPath, file);
+    inspectAndDescribeFile(resolvedFilePath, asyncCb);
+  }, cb);
+}
+
+module.exports = {
+  getUserHomeFolder,
+  getFilesInFolder,
+  inspectAndDescribeFiles
+};
+```
+
+userInterface.js:
+```javascript
+'use strict';
+
+let document;
+
+function displayFile(file) {
+  const mainArea = document.getElementById('main-area');
+  const template = document.querySelector('#item-template');
+  let clone = document.importNode(template.content, true);
+  clone.querySelector('img').src = `images/${file.type}.svg`;
+  clone.querySelector('.filename').innerText = file.file;
+  mainArea.appendChild(clone);
+}
+
+function displayFiles(err, files) {
+  if (err) {
+    return aler('Sorry, we could not display your files');
+  }
+  files.forEach(displayFile);
+}
+
+function bindDocument(window) {
+  if (!document) {
+    document = window.document;
+  }
+}
+
+module.exports = {
+  bindDocument,
+  displayFiles
+};
+```
+
+app.js:
+```javascript
+'use strict';
+
+const fileSystem = require('./fileSystem');
+const userInterface = require('./userInterface');
+
+function main() {
+  userInterface.bindDocument(window);
+  const folderPath = fileSystem.getUserHomeFolder();
+  fileSystem.getFilesInFolder(folderPath, (err, files) => {
+    if (err) {
+      return alert('Sorry, we could not load your home folder');
+    }
+    fileSystem.inspectAndDescribeFiles(folderPath, files, userInterface.displayFiles);
+  });
+}
+
+main();
+```
+
+index.html
+```html
+<html>
+  <head>
+    <title>Lorikeet</title>
+    <link rel="stylesheet" href="app.css" />
+    <script src="app.js"></script>
+  </head>
+  <body>
+    <template id="item-template">
+      <div class="item">
+        <img class="icon" />
+        <div class="filename"></div>
+      </div>
+    </template>
+    <div id="toolbar">
+      <div id="current-folder">
+        <script>
+          document.write(fileSystem.getUserHomeFolder());
+        </script>
+      </div>
+    </div>
+    <div id="main-area"></div>
+  </body>
+</html>
+```
+
+#### Handling double-clicks on folders
