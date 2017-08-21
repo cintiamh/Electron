@@ -12,7 +12,9 @@ function resetIndex() {
 }
 
 function addToIndex(file) {
-  index.add(file);
+  if (index) {
+    index.add(file);
+  }
 }
 
 function find(query, cb) {
@@ -20,7 +22,9 @@ function find(query, cb) {
     resetIndex();
   }
   const results = index.search(query);
-  cb(results);
+  if (typeof cb === 'function') {
+    cb(results);
+  }
 }
 
 module.exports = { addToIndex, find, resetIndex };

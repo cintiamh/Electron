@@ -798,3 +798,12 @@ module.exports = {
   bindSearchField
 }
 ```
+
+Include the search as dependency in userInterface.js:
+```javascript
+'use strict';
+
+let document;
+const fileSystem = require('./fileSystem');
+const search = require('./search');
+```
