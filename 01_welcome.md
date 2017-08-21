@@ -900,3 +900,56 @@ window.onload = main;
 ### Enhancing navigation in the app
 
 #### Making the current folder path clickable
+
+Import the path module into userInterface.js:
+```javascript
+const path = require('path');
+```
+
+Create a convertFolderPathIntoLinks function:
+```javascript
+function convertFolderPathIntoLinks(folderPath) {
+  const folders = folderPath.split('path.sep');
+  const contents = [];
+  let pathAtFolder = '';
+  folders.forEach((folder) => {
+    pathAtFolder += folder + path.sep;
+    contnts.push(`<span class="path" data-path="${pathAtFolder.slice(0, -1)}">${folder}</span>`);
+  });
+  return contents.join(path.sep).toString();
+}
+```
+
+Also have a bindCurrentFolderPath function:
+```javascript
+function bindCurrentFolderPath() {
+  const load = (event) => {
+    const folderPath = event.target.getAttribute('data-path');
+    loadDirectory(folderPath)();
+  };
+  const paths = document.getElementsByClassName('path');
+  for (var i = 0; i < paths.length; i++) {
+    paths[i].addEventListener('click', load, false);
+  }
+}
+```
+
+And change the displayFolderPath function:
+```javascript
+function displayFolderPath(folderPath) {
+  document.getElementById('current-folder').innerHtml = convertFolderPathIntoLinks(folderPath);
+  bindCurrentFolderPath();
+}
+```
+
+#### Getting the app to load at the folder path
+
+Small change on app.css file:
+```css
+span.path:hover {
+  opacity: 0.7;
+  cursor: pointer;
+}
+```
+
+#### Opening files with their default application
