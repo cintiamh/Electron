@@ -13,7 +13,7 @@ function main() {
     if (query === '') {
       userInterface.resetFilter();
     } else {
-      search.find(query, userInterface.filterResults());
+      search.find(query, userInterface.filterResults);
     }
   })
 }
