@@ -807,3 +807,96 @@ let document;
 const fileSystem = require('./fileSystem');
 const search = require('./search');
 ```
+
+Include the loadDirectory function:
+```javascript
+function loadDirectory(folderPath) {
+  return function(window) {
+    if (!document) {
+      document = window.document;
+    }
+    search.resetIndex();
+    displayFolderPath(folderPath);
+    fileSystem.getFilesInFolder(folderPath, (err, files) => {
+      clearView();
+      if (err) {
+        return alert('Sorry, you could not load your folder');
+      }
+      fileSystem.inspectAndDescribeFiles(folderPath, files, displayFiles);
+    })
+  }
+}
+```
+
+Include the displayField function:
+```javascript
+function displayFile(file) {
+  const mainArea = document.getElementById('main-area');
+  const template = document.querySelector('#item-template');
+  let clone = document.importNode(template.content, true);
+  search.addToIndex(file);
+  clone.querySelector('img').src = `images/${file.type}.svg`;
+  // Attaches file's path as data attribute to image element.
+  clone.querySelector('img').setAttribute('data-filePath', file.path);
+  if (file.type === 'directory') {
+    clone.querySelector('img').addEventListener('dblclick', () => {
+      loadDirectory(file.path)();
+    }, false);
+  }
+  clone.querySelector('.filename').innerText = file.file;
+  mainArea.appendChild(clone);
+}
+```
+
+Update the filterResults and resetFilter functions:
+```javascript
+function filterResults(results) {
+  // Collects file paths for search results so you can compare them
+  const validFilePaths = results ? results.map((result) => result.ref) : [];
+  const items = document.getElementsByClassName('item');
+  for (var i = 0; i < items.length; i++) {
+    let item = items[i];
+    let filePath = item.getElementsByTagName('img')[0].getAttribute('data-filePath');
+    if (validFilePaths.indexOf(filePath) !== -1) {
+      item.style = null;
+    } else {
+      item.style = 'display: none;'
+    }
+  }
+}
+
+function resetFilter() {
+  const items = document.getElementsByClassName('item');
+  for (var i = 0; i < items.length; i++) {
+    items[i].style = null;
+  }
+}
+```
+
+Update the app.js file:
+```javascript
+'use strict';
+
+const fileSystem = require('./fileSystem');
+const userInterface = require('./userInterface');
+const search = require('./search');
+
+function main() {
+  userInterface.bindDocument(window);
+  const folderPath = fileSystem.getUserHomeFolder();
+  userInterface.loadDirectory(folderPath)(window);
+  userInterface.bindSearchField((event) => {
+    const query = event.target.value;
+    if (query === '') {
+      userInterface.resetFilter();
+    } else {
+      search.find(query, userInterface.filterResults);
+    }
+  })
+}
+window.onload = main;
+```
+
+### Enhancing navigation in the app
+
+#### Making the current folder path clickable
