@@ -59,8 +59,13 @@ function bindDocument(window) {
   }
 }
 
+function bindSearchField(cb) {
+  document.getElementById('search').addEventListener('keyup', cb, false);
+}
+
 module.exports = {
   bindDocument,
   displayFiles,
-  loadDirectory
+  loadDirectory,
+  bindSearchField
 };

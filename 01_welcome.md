@@ -720,3 +720,81 @@ update the current-folder div inside index.html
 ```
 
 ### Implementing Quick Search
+
+1. Add a search field to the top right of the toolbar.
+2. Add an in-memory search library.
+3. Add the list of files and folders in the current folder to the search index.
+4. When the user begins searching, filter the files displayed in the main area.
+
+#### Adding the search field in the toolbar
+
+Include the search field after the current path:
+
+```html
+<input type="search" id="search" results="5" placeholder="Search" />
+```
+
+And some CSS:
+```css
+#search {
+  float: right;
+  padding: 0.5em;
+  min-width: 10em;
+  border-radius: 3em;
+  margin: 2em 1em;
+  border: none;
+  outline: none;
+}
+```
+
+#### Adding an in-memory search library
+
+Install lunr.js:
+```
+$ npm i lunr --save
+$ touch search.js
+```
+
+search.js file:
+```javascript
+'use strict';
+
+const lunr = require('lunr');
+let index;
+
+function resetIndex() {
+  index = lunr(function() {
+    this.field('file');
+    this.field('type');
+    this.ref('path');
+  });
+}
+
+function addToIndex(file) {
+  index.add(file);
+}
+
+function find(query, cb) {
+  if (!index) {
+    resetIndex();
+  }
+  const results = index.search(query);
+  cb(results);
+}
+
+module.exports = { addToIndex, find, resetIndex };
+```
+
+#### Hooking up the search functionality with the UI
+
+userInterface.js
+```javascript
+function bindSearchField(cb) {
+  document.getElementById('search').addEventListener('keyup', cb, false);
+}
+
+module.exports = {
+  ...,
+  bindSearchField
+}
+```
