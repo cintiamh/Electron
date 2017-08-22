@@ -5,6 +5,14 @@ const fs = require('fs');
 const osenv = require('osenv');
 const path = require('path');
 
+let shell;
+
+if (process && process.versions && process.versions.electron) {
+  shell = require('electron').shell;
+} else if (window) {
+  shell = window.require('nw.gui').Shell;
+}
+
 function getUserHomeFolder() {
   return osenv.home();
 }
@@ -41,8 +49,13 @@ function inspectAndDescribeFiles(folderPath, files, cb) {
   }, cb);
 }
 
+function openFile(filePath) {
+  shell.openItem(filePath);
+}
+
 module.exports = {
   getUserHomeFolder,
   getFilesInFolder,
-  inspectAndDescribeFiles
+  inspectAndDescribeFiles,
+  openFile
 };

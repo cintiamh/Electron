@@ -48,6 +48,10 @@ function displayFile(file) {
     clone.querySelector('img').addEventListener('dblclick', () => {
       loadDirectory(file.path)();
     }, false);
+  } else {
+    clone.querySelector('img').addEventListener('dblclick', () => {
+      fileSystem.openFile(file.path);
+    }, false);
   }
   clone.querySelector('.filename').innerText = file.file;
   mainArea.appendChild(clone);
@@ -93,12 +97,12 @@ function bindSearchField(cb) {
 }
 
 function convertFolderPathIntoLinks(folderPath) {
-  const folders = folderPath.split('path.sep');
+  const folders = folderPath.split(path.sep);
   const contents = [];
   let pathAtFolder = '';
   folders.forEach((folder) => {
     pathAtFolder += folder + path.sep;
-    contnts.push(`<span class="path" data-path="${pathAtFolder.slice(0, -1)}">${folder}</span>`);
+    contents.push(`<span class="path" data-path="${pathAtFolder.slice(0, -1)}">${folder}</span>`);
   });
   return contents.join(path.sep).toString();
 }
