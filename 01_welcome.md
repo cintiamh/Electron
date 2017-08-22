@@ -1085,4 +1085,8 @@ $ npm run pack
 
 This will start the build and the build can be found inside a folder called dist.
 
+For more build options read:
+
 https://github.com/electron-userland/electron-builder/wiki/Options
+
+#### Setting the app icon on the apps

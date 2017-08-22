@@ -4,6 +4,7 @@
   "description": "A file explorer application",
   "main": "index.js",
   "author": "Cintia Higashi <cintiamh@gmail.com>",
+  "icon": "icon.png",
   "scripts": {
     "pack": "build",
     "dist": "build",
