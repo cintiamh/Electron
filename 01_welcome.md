@@ -1009,3 +1009,80 @@ module.exports = {
 * Testing those apps out on the various platforms.
 
 #### Creating the app icon
+
+The first step is to create an app icon as a high-resolution PNG at 512x512 pixels.
+
+##### MacOS
+
+MacOS uses the ICNS file format for app icons.
+
+* 16px
+* 32px
+* 128px
+* 256px
+* 512px
+
+You can use "iConvert Icons" app for MacOS.
+You can also download Icon Composer for free.
+
+##### Windows
+
+Microsoft Windows uses the ICO file format for its icons.
+
+##### Linux
+
+The .desktop file is a configuration file that contains details about what the app name is, where it runs from, what icon it has, and some other configuration information.
+
+### Packaging the app for distribution
+
+```
+$ npm install electron-builder electron --save-dev
+```
+
+You install electron-builder and electron as development dependencies for the app.
+
+In order to make electron-builder work, you need to check that the package.json file has the following fields:
+
+* name
+* description
+* version
+* author
+* build configuration
+* scripts for packaging and distribution
+
+package.json
+```javascript
+{
+  "name": "lorikeet",
+  "version": "1.0.0",
+  "description": "A file explorer application",
+  "main": "index.js",
+  "author": "Cintia Higashi <cintiamh@gmail.com>",
+  "scripts": {
+    "pack": "build",
+    "dist": "build",
+    "dev": "electron ."
+  },
+  "build": {},
+  "keywords": [],
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^1.7.5",
+    "electron-builder": "^19.24.1"
+  },
+  "dependencies": {
+    "async": "^2.5.0",
+    "lunr": "^1.0.0",
+    "osenv": "^0.1.4"
+  }
+}
+```
+
+In order to build run:
+```
+$ npm run pack
+```
+
+This will start the build and the build can be found inside a folder called dist.
+
+https://github.com/electron-userland/electron-builder/wiki/Options
