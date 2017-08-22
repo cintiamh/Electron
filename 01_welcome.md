@@ -953,3 +953,59 @@ span.path:hover {
 ```
 
 #### Opening files with their default application
+
+Updating displayFile method in userInterface.js file:
+```javascript
+function displayFile(file) {
+  const mainArea = document.getElementById('main-area');
+  const template = document.querySelector('#item-template');
+  let clone = document.importNode(template.content, true);
+  search.addToIndex(file);
+  clone.querySelector('img').src = `images/${file.type}.svg`;
+  // Attaches file's path as data attribute to image element.
+  clone.querySelector('img').setAttribute('data-filePath', file.path);
+  if (file.type === 'directory') {
+    clone.querySelector('img').addEventListener('dblclick', () => {
+      loadDirectory(file.path)();
+    }, false);
+  } else {
+    clone.querySelector('img').addEventListener('dblclick', () => {
+      fileSystem.openFile(file.path);
+    }, false);
+  }
+  clone.querySelector('.filename').innerText = file.file;
+  mainArea.appendChild(clone);
+}
+```
+
+Update fileSystem.js file (include the following snipped on the top):
+```javascript
+let shell;
+
+if (process && process.versions && process.versions.electron) {
+  shell = require('electron').shell;
+} else if (window) {
+  shell = window.require('nw.gui').Shell;
+}
+
+// ...
+
+function openFile(filePath) {
+  shell.openItem(filePath);
+}
+
+module.exports = {
+  // ...
+  openFile
+};
+```
+
+## Shipping your first Desktop application
+
+### Setting up the app for distribution
+
+* Getting the app to display a custom icon in place of the default app.
+* Creating native binaries of the app for the different OSs.
+* Testing those apps out on the various platforms.
+
+#### Creating the app icon
