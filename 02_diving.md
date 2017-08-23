@@ -151,3 +151,25 @@ $ npm install
 ```
 
 ### Packaging your modules and apps with npm
+
+Successful npm module: how easy is it for other developers to install and get running on their local development machine.
+
+#### Controlling dependency versions in package.json
+
+npm's shrinkwrap command will lock down the version of dependencies that are installed with the module.
+
+```
+$ npm shrinkwrap
+```
+
+* Keep dependencies in the package.json file up to date,
+* keep node_modules folder out of version control,
+* when needed use npm shrinkwrap to lock down the dependencies in use.
+
+#### Publishing applications and modules to npm
+
+* Create a free account (npmjs.com),
+* `npm login`
+* `npm publish` => This will push a copy of the module up to npm, and you'll be able to install it via npm install.
+
+# Exploring NW.js and Electron's internals
