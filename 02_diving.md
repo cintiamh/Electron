@@ -173,3 +173,41 @@ $ npm shrinkwrap
 * `npm publish` => This will push a copy of the module up to npm, and you'll be able to install it via npm install.
 
 # Exploring NW.js and Electron's internals
+
+Both combines Node.js with Chromium, but took different approaches.
+
+## How does NW.js work under the hood?
+
+Three things necessary for Node.js and Chromium to work together:
+* Make Node.js and Chromium use the same instance of V8.
+* Integrate the main event loop.
+* Bridge the JavaScript context between Node and Chromium.
+
+Name history:
+* WebKit => Blink
+* Node.js => IO.js => Node.js
+* node-webkit => NW.js
+
+### Using the same instance of V8
+
+Both Node.js and Chromium use V8 to handle executing JavaScript.
+
+The first thing NW.js does is load Node.js and Chromium so that both of them have their JavaScript contexts loaded in the V8 engine.
+
+When this is done, the JavaScript context for Node.js can be copied into the JavaScript context for Chromium.
+
+### Integrating the main event loop
+
+Node.js and Chromium use different software libraries:
+* Node.js => libuv
+* Chromium => custom C++ libraries (MessageLoop and MessagePump)
+
+When the JavaScript context for Node.js is copied into Chromium's JavaScript context, Chromium's event loop is adjusted to use a custom version of the MessagePump class, build on top of libuv, and in this way, they're able to work together.
+
+### Bridging the JavaScript context between Node and Chromium
+
+Node.js kicks off with a `start` function that handles executing code.
+
+To get Node.js to work with Chromium, the `start` function has to be split into parts so that it can execute in line with Chromium's rendering process.
+
+## How does Electron work under the hood?
