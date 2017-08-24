@@ -211,3 +211,52 @@ Node.js kicks off with a `start` function that handles executing code.
 To get Node.js to work with Chromium, the `start` function has to be split into parts so that it can execute in line with Chromium's rendering process.
 
 ## How does Electron work under the hood?
+
+Electron's architecture emphasizes a clean separation between the Chromium source code and the app.
+
+```
++-------------------------------------------------+
+|                   Electron                      |
+| +---------------------------------------------+ |
+| |                   Atom                      | |
+| | +-----+ +---------+ +----------+ +--------+ | |
+| | | App | | Browser | | Renderer | | Common | | |
+| | +-----+ +---------+ +----------+ +--------+ | |
+| +---------------------------------------------+ |
+| +---------------------------------------------+ |
+| |            Chromium source code             | |
+| +---------------------------------------------+ |
++-------------------------------------------------+
+```
+
+The Atom component is the C++ source code for the shell.
+
+The Chromium's source code is used by Atom shell to combine Chromium with Node.js.
+
+### Introducing libchromiumcontent
+
+https://github.com/electron/libchromiumcontent
+
+Electron uses libchromiumcontent to load Chromium's content module, which includes Blink and V8.
+
+You use the Chromium content module to handle rendering web pages for the app windows.
+
+### Electron's components
+
+#### App
+
+Handles code that needs to load at the start of Electron (loading Node.js, loading Chromium's content module, and accessing libuv).
+
+#### Browser
+
+Handles interacting with the front-end part of the app (initializing the JavaScript engine, interacting with the UI, binding modules that are specific to each OS)
+
+#### Renderer
+
+Code that runs in Electron's renderer processes. In Electron, each app window runs as a separate process, just like Google Chrome's tabs.
+
+#### Common
+
+Utility code used by both the main and renderer processes for running the app.
+
+### How Electron handles running the app
