@@ -260,3 +260,11 @@ Code that runs in Electron's renderer processes. In Electron, each app window ru
 Utility code used by both the main and renderer processes for running the app.
 
 ### How Electron handles running the app
+
+With Electron, any sharing of state from the back-end part of the app to the front-end part and vice versa has to go through the ipcMain and ipcRenderer modules.
+
+This way, the JavaScript contexts of the main process and the renderer process are kept separate, but data can be transmitted between the processes in an explicit fashion.
+
+The ipcMain and ipcRenderer modules are event emitters that handle interprocess communication between the back end of the app (ipcMain), and the front-end app windows (ipcRenderer).
+
+## How does Node.js work with NW.js and Electron?
