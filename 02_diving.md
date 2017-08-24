@@ -1,5 +1,8 @@
 # Diving Deeper
 
+* [Using Node.js within NW.js and Electron](#using-node.js-within-nw.js-and-electron)
+* [Exploring NW.js and Electron's internals](#exploring-nw.js-and-electrons-internals)
+
 # Using Node.js within NW.js and Electron
 
 ## What is Node.js?
