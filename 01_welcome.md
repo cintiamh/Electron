@@ -1,5 +1,10 @@
 # Welcome to Node.js desktop application development
 
+* [Introducing Electron and NW.js](#introducing-electron-and-nwjs)
+* [Laying the foundation for your first desktop application](#laying-the-foundation-for-your-first-desktop-application)
+* [Building your first desktop application](#building-your-first-desktop-application)
+* [Shipping your first Desktop application](#shipping-your-first-desktop-application)
+
 ## Introducing Electron and NW.js
 
 * Electron (GitHub)
