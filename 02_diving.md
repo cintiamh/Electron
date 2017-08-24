@@ -268,3 +268,29 @@ This way, the JavaScript contexts of the main process and the renderer process a
 The ipcMain and ipcRenderer modules are event emitters that handle interprocess communication between the back end of the app (ipcMain), and the front-end app windows (ipcRenderer).
 
 ## How does Node.js work with NW.js and Electron?
+
+Node.js interacts with the hybrid desktop environments of NW.js and Electron similarly to server-side apps.
+
+### Where Node.js fits into NW.js
+
+NW.js makes Node.js available through the context of the embedded web browser, which means you can script JavaScript files that access both Node.js's API and API methods related to the browser's JavaScript namespace.
+
+### Drawbacks of using Node.js in NW.js
+
+#### The Node.js context is accessible to all windows
+
+There's a way to share state between windows through code that operates on Node.js's namespace properties. On Blink's side each window is independent from each other (like Chrome tabs).
+
+#### Common API methods in Chromium and Node.js
+
+It depends it can come from Node.js or Blink.
+
+### How Node.js is used within Electron
+
+Electron uses Node.js's `node_bindings` feature.
+
+Electron handles the JavaScript contexts of Node.js and Chromium by keeping the back-end code's JavaScript state separate from that of the front-end app window's state.
+
+Data sharing between the back-end and app windows is handled via inter-process communication, or message passing.
+
+More info: http://jlord.us/essential-electron/#stay-in-touch
