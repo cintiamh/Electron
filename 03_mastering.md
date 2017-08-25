@@ -1,6 +1,7 @@
 # Mastering Node.js desktop application development
 
 * [Controlling how your desktop app is displayed](#controlling-how-your-desktop-app-is-displayed)
+* [Creating tray applications](#creating-tray-applications)
 
 # Controlling how your desktop app is displayed
 
@@ -245,3 +246,60 @@ Apps that restrict access to the underlying OS.
 Kiosk mode in both NW.js and Electron is a locked-down mode where access to the underlying OS is difficult - in fact, being able to quit the app has to be manually added by the developer.
 
 #### Creating kiosk-mode apps in NW.js
+
+package.json config file:
+```json
+{
+  "window": {
+    "kiosk": true
+  }
+}
+```
+
+In order to leave the kiosk mode, you need to implement some kind of keyboard shortcut or button that when clicked or typed calls an API function on the app window called `leaveKioskMode`.
+
+example:
+```html
+<html>
+  <head>
+    <title>Kiosk mode NW.js app example</title>
+    <script>
+      'use strict';
+      const gui = require('nw.gui');
+      const win = gui.Window.get();
+      function exit() {
+        win.leaveKioskMode();
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Kiosk mode app</h1>
+    <button onclick="exit();">Exit</button>
+  </body>
+</html>
+```
+
+#### Creating kiosk apps with Electron
+
+```javascript
+mainWindow = new BrowserWindow({ kiosk: true });
+```
+
+And the toggle method would look like this:
+```javascript
+const remote = require('electron').remote;
+
+function toggleKiosk() {
+  const button = document.getElementById('kiosk');
+  const win = remote.getCurrentWindow();
+  if (win.isKiosk()) {
+    win.setKiosk(false);
+    button.innerText = 'Enter kiosk mode';
+  } else {
+    win.setKiosk(true);
+    button.innerText = 'Exit kiosk mode';
+  }
+}
+```
+
+# Creating tray applications
