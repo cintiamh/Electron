@@ -303,3 +303,57 @@ function toggleKiosk() {
 ```
 
 # Creating tray applications
+
+## Creating a simple tray app with NW.js
+
+index.html
+```html
+<html>
+  <head>
+    <title>Tray app example</title>
+    <script>
+      const gui = require('nw.gui');
+      const tray = new gui.Tray({
+        title: 'My tray app'
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Hello world</h1>
+  </body>
+</html>
+```
+
+#### Should you use text labels for tray apps?
+
+MacOS X is fine with text labels, but on Windows and Linux, tray apps display icons only.
+
+Your safest option is to go with using icons only for your tray apps.
+
+```javascript
+const tray = new gui.Tray({icon: 'icon@2x.png'});
+```
+
+### Adding menus to your tray icon
+
+```javascript
+const notes = [
+  {
+    title: 'todo list',
+    contents: 'grocery shopping\npick up kids\nsend birthday party invites'},
+  {
+    title: 'grocery list',
+    contents: 'Milk\nEggs\nButter\nDouble Cream'},
+  {
+    title: 'birthday invites',
+    contents: 'Dave\nSue\nSally\nJohn and Joanna\nChris and Georgina\nElliot'
+  }
+];
+
+const menu = new gui.Menu();
+notes.forEach((note) => {
+  menu.append(new gui.MenuItem({label: note.title}));
+}
+
+tray.menu = menu;
+```
