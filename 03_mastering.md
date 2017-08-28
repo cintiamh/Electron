@@ -341,9 +341,11 @@ const notes = [
   {
     title: 'todo list',
     contents: 'grocery shopping\npick up kids\nsend birthday party invites',
+  },
   {
     title: 'grocery list',
     contents: 'Milk\nEggs\nButter\nDouble Cream',
+  },
   {
     title: 'birthday invites',
     contents: 'Dave\nSue\nSally\nJohn and Joanna\nChris and Georgina\nElliot'
