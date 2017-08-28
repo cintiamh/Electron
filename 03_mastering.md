@@ -483,3 +483,60 @@ ipc.on('displayNote', displayNote);
 Icons need to be within 32x32 pixel dimension.
 
 # Creating application and context menus
+
+## Adding menus to your app
+
+Types:
+* app window menus: top of app window, under the title bar (or in the system menu on Mac OS)
+* context menus: shows up when you right click an item in the app
+* tray menus: covered in tray apps
+
+### App window menus
+
+Microsoft Windows and Linux handles the same way, and Mac OS is the odd one.
+* Windows and Linux: each app window has its own menu placed within it.
+* Mac OS: only one app menu for all the windows.
+
+### Creating menus for Mac OS apps with NW.js
+
+* Skipping
+
+### Creating menus for Mac OS apps with Electron
+
+When defining an app menu in Electron, you need to add it to an app window.
+
+```javascript
+const electron = require('electron');
+const Menu = electron.remote.Menu;
+const name = electron.remote.app.getName();
+
+const template = [
+  {
+    label: '',
+    submenu: [
+      {
+        label: 'About ' + name
+      }
+    ]
+  }
+]
+```
+
+https://www.npmjs.com/package/electron-default-menu
+
+```
+$ npm i electron-default-menu --save
+```
+
+Change app.js file:
+```javascript
+const electron = require('electron');
+const defaultMenu = require('electron-default-menu');
+const Menu = electron.remote.Menu;
+
+// Calls it in place of template code to provide default menu
+const menu = Menu.buildFromTemplate(defaultMenu());
+Menu.setAppMenu(menu);
+```
+
+The electron-default-menu module provides the app window with more actions and provides a base for adding other menu items.
