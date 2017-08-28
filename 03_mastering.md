@@ -340,10 +340,10 @@ const tray = new gui.Tray({icon: 'icon@2x.png'});
 const notes = [
   {
     title: 'todo list',
-    contents: 'grocery shopping\npick up kids\nsend birthday party invites'},
+    contents: 'grocery shopping\npick up kids\nsend birthday party invites',
   {
     title: 'grocery list',
-    contents: 'Milk\nEggs\nButter\nDouble Cream'},
+    contents: 'Milk\nEggs\nButter\nDouble Cream',
   {
     title: 'birthday invites',
     contents: 'Dave\nSue\nSally\nJohn and Joanna\nChris and Georgina\nElliot'
@@ -352,8 +352,62 @@ const notes = [
 
 const menu = new gui.Menu();
 notes.forEach((note) => {
-  menu.append(new gui.MenuItem({label: note.title}));
+  menu.append(new gui.MenuItem({ label: note.title }));
 }
 
 tray.menu = menu;
+```
+
+## Creating a tray app with Electron
+
+### Building the initial app skeleton
+
+Start a new project:
+```
+$ npm init -y
+$ npm i --save-dev electron
+```
+
+package.json
+```json
+{
+  "name": "trayapp",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^1.7.5"
+  }
+}
+```
+
+Create index.html file:
+```html
+<html>
+  <head>
+    <title>tray app Electron</title>
+    <link href="app.css" rel="stylesheet">
+    <script src="app.js"></script>
+  </head>
+  <body>
+    <h1 id="title"></h1>
+    <div id="contents"></div>
+  </body>
+</html>
+```
+
+Create app.css file:
+```css
+body {
+  background: #E2D53C;
+  color: #292929;
+  font-family: 'Comic Sans', 'Comic Sans MS';
+  font-size: 14pt;
+  font-style: italic;
+}
 ```
