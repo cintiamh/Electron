@@ -2,6 +2,7 @@
 
 * [Controlling how your desktop app is displayed](#controlling-how-your-desktop-app-is-displayed)
 * [Creating tray applications](#creating-tray-applications)
+* [Creating application and context menus](#creating-application-and-context-menus)
 
 # Controlling how your desktop app is displayed
 
@@ -355,7 +356,7 @@ const notes = [
 const menu = new gui.Menu();
 notes.forEach((note) => {
   menu.append(new gui.MenuItem({ label: note.title }));
-}
+})
 
 tray.menu = menu;
 ```
@@ -480,3 +481,5 @@ ipc.on('displayNote', displayNote);
 ```
 
 Icons need to be within 32x32 pixel dimension.
+
+# Creating application and context menus
