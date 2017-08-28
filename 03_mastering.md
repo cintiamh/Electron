@@ -478,3 +478,5 @@ function displayNote(event, note) {
 const ipc = require('electron').ipcRenderer;
 ipc.on('displayNote', displayNote);
 ```
+
+Icons need to be within 32x32 pixel dimension.
