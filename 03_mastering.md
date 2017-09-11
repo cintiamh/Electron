@@ -540,3 +540,94 @@ Menu.setAppMenu(menu);
 ```
 
 The electron-default-menu module provides the app window with more actions and provides a base for adding other menu items.
+
+## Context Menus
+
+### Creating a context menu with Electron
+
+The context menu has two items:
+* Open: Open an HTML file to edit
+* Save: Save updates on file on the user's computer.
+
+```javascript
+const electron = require('electron');
+const Menu = electron.remote.Menu;
+const MenuItem = electron.remote.MenuItem;
+const ipc = electron ipcRenderer;
+const dialog = electron.remote.dialog;
+const designMenu = require('./designMenu');
+let currentFile;
+let content;
+let tabWas;
+let done;
+```
+
+Code for opening files from the UI:
+```javascript
+function openFile(cb) {
+  dialog.showOpenDialog((files) => {
+    ipc.send('readFile', files);
+    if (files) currentFile = files[0];
+    if (cb && typeof cb === 'function') cb();
+  })
+}
+```
+
+Code for opening files from the back end.
+```javascript
+'use strict';
+
+const electron = require('electron');
+const fs = require('fs');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
+const ipc = electron.ipcMain;
+let mainWindow = null;
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('ready', () => {
+  mainWindow = new BrowserWindow();
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.on('closed', () => { mainWindow = null; });
+});
+
+function readFile(event, files) {
+  if (files) {
+    const filePath = files[0];
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      event.sender.send('fileRead', err, data);
+    });
+  }
+};
+
+function saveFile(event, currentFile, content) {
+  fs.writeFile(currentFile, content, (err) => {
+    event.sender.send('fileSaved', err);
+  });
+}
+
+ipc.on('readFile', readFile);
+ipc.on('saveFile', saveFile);
+```
+
+### Adding the context menu with Electron
+
+designMenu.js file:
+```javascript
+function initialize() {
+  const menu = new Menu();
+  menu.append(new MenuItem({ label: 'Insert image', click: insertImage }));
+  menu.append(new MenuItem({ label: 'Insert video', click: insertVideo }));
+  document.querySelector('#designArea')
+    .addEventListener('contextMenu', function(event) {
+      event.preventDefault();
+      x = event.x;
+      y = event.y;
+      menu.popup(x, y);
+      return false;
+    });
+}
+```
