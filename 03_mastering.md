@@ -3,6 +3,8 @@
 * [Controlling how your desktop app is displayed](#controlling-how-your-desktop-app-is-displayed)
 * [Creating tray applications](#creating-tray-applications)
 * [Creating application and context menus](#creating-application-and-context-menus)
+* [Dragging and dropping files and crafting the UI](#dragging-and-dropping-files-and-crafting-the-ui)
+* [Using a webcam in your application](#using-a-webcam-in-your-application)
 
 # Controlling how your desktop app is displayed
 
@@ -631,3 +633,71 @@ function initialize() {
     });
 }
 ```
+
+# Dragging and dropping files and crafting the UI
+
+## Dragging and dropping files onto the app
+
+### Implementing drag-and-drop with Electron
+
+You can reuse code written for websites and apps to build desktop apps, saving time when you add drag-and-drop to your desktop apps.
+
+Capture any attempts to drag-and-drop a file onto the screen area:
+```javascript
+function stopDefaultEvent(event) {
+  event.preventDefault();
+  return false;
+}
+window.ondragover = stopDefaultEvent;
+window.ondrop = stopDefaultEvent;
+```
+
+Create a function to intecept the events:
+```javascript
+function interceptDroppedFiles() {
+  const interceptArea = window.document.querySelector('#load-icon-holder');
+  interceptArea.ondrop = function(event) {
+    event.preventDefault();
+    if (event.dataTransfer.files.length !== 1) {
+      window.alert('You have dragged too many files into the app. Drag just 1 file.');
+    } else {
+      interceptArea.style.display = 'none';
+      displayIconsSet();
+      const file = event.dataTransfer.files[0];
+      displayImageInIconSet(file.path);
+    }
+    return false;
+  }
+}
+```
+
+## Mimicking the native look of the OS
+
+### Detecting the user's OS
+
+```javascript
+'use strict';
+
+const os = require('os');
+const platform = os.platform();
+
+switch(platform) {
+  case 'darwin':
+    console.log('Running Mac OS');
+    break;
+  case 'linux':
+    console.log('Running Linux');
+    break;
+  case 'win32':
+    console.log('Running Windows');
+    break;
+  default:
+    console.log('Could not detect OS for platform', platform);
+}
+```
+
+There are some Style Libraries that mimics OS styles:
+* Mac OS Photon: http://photonkit.com/
+* React Desktop: http://reactdesktop.js.org/
+
+# Using a webcam in your application
