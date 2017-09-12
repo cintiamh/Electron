@@ -816,3 +816,119 @@ The `takePhoto` function directly triggers the rendering of the Save File dialog
 https://electron.atom.io/docs/api/dialog/
 
 # Storing app data
+
+## What data store option should I use?
+
+Storing data in web apps:
+* IndexedDB: https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
+* localStorage: https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API
+* Lovefield: https://github.com/google/lovefield
+* PouchDB: https://pouchdb.com/
+* SQLite: http://sqlite.com/
+* NeDB: https://github.com/louischatriot/nedb/
+* LevelDB: http://leveldb.org/
+* Minimongo: https://github.com/mWater/minimongo
+
+* Relational databases: Data won't change much, powerful querying capabilities.
+* Browser-based API: no more than 5MB of data like user settings.
+* SQL-based or NoSQL-based: The design of the data schemas and whether the data is denormalized or not will go some way toward helping you choose between them.
+
+## Storing a sticky note with the localStorage API
+
+https://github.com/paulbjensen/cross-platform-desktop-applications/tree/master/chapter-12/let-me-remember-electron
+
+```
+$ mkdir let-me-remember
+$ cd let-me-remember
+$ npm init -y
+$ npm i electron --save
+$ touch main.js
+$ touch index.html
+$ touch app.css
+$ touch app.js
+```
+
+The package.json file content:
+```json
+{
+  "name": "let-me-remember",
+  "version": "1.0.0",
+  "description": "A sticky note app for Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "electron"
+  ],
+  "author": "Cintia Higashi",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.7.6"
+  }
+}
+```
+
+main.js content:
+```javascript
+'use strict';
+
+const electron = require('electron');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
+let mainWindow = null;
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('ready', () => {
+  mainWindow = new BrowserWindow({
+    width: 480,
+    height: 320,
+    frame: false,
+  });
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.on('closed', () => { mainWindow = null; });
+});
+```
+
+The app.js file content:
+```javascript
+'use strict';
+
+const electron = require('electron');
+const app = electron.remote.app;
+
+function initialize() {
+  let notes = window.localStorage.notes;
+  if (!notes) notes = 'Let me remember...';
+  window.document.querySelector('textarea').value = notes;
+}
+
+function saveNote() {
+  let notes = window.document.querySelector('textarea').value;
+  window.localStorage.setItem('notes', notes);
+}
+
+function quit() {
+  app.quit();
+}
+
+window.onload = initialize;
+```
+
+The index.html file content:
+```html
+<html>
+  <head>
+    <title>Let me remember</title>
+    <link rel="stylesheet" type="text/css" href="app.css" />
+    <script src="app.js"></script>
+  </head>
+  <body>
+    <div id="close" onclick="quit();">X</div>
+    <textarea onKeyUp="saveNotes();"></textarea>
+  </body>
+</html>
+```

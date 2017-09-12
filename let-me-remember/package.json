@@ -1,0 +1,17 @@
+{
+  "name": "let-me-remember",
+  "version": "1.0.0",
+  "description": "A sticky note app for Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "electron"
+  ],
+  "author": "Cintia Higashi",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.7.6"
+  }
+}
