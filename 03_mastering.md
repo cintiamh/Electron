@@ -809,3 +809,7 @@ function takePhoto() {
 }
 window.onload = initialize;
 ```
+
+The `takePhoto` function directly triggers the rendering of the Save File dialog window.
+
+https://electron.atom.io/docs/api/dialog/
