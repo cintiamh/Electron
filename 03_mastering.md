@@ -701,3 +701,111 @@ There are some Style Libraries that mimics OS styles:
 * React Desktop: http://reactdesktop.js.org/
 
 # Using a webcam in your application
+
+With the introduction of the HTML5 Media Capture API, webcams can be accessible to web pages.
+
+## Photo snapping with the HTML5 media capture API
+
+Example with Electron: https://github.com/paulbjensen/cross-platform-desktop-applications/tree/master/chapter-11/facebomb-electron
+
+### Creating Facebomb with Electron
+
+The main.js file for the Facebomb Electron app:
+```javascript
+'use strict';
+
+const electron = require('electron');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
+
+let mainWindow = null;
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('ready', () => {
+  // useContentSize ensures the width and height refers to the content of the app window
+  // and not the entire app window
+  mainWindow = new BrowserWindow({
+    useContentSize: true,
+    width: 800,
+    height: 600,
+    resizable: false,
+    fullscreen: false
+  });
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.on('closed', () => { mainWindow = null; });
+})
+```
+
+The index.html file for the Facebomb Electron app:
+```html
+<html>
+  <head>
+    <title>Facebomb</title>
+    <link href="app.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/font-awesome.min.css" />
+    <script src="app.js"></script>
+  </head>
+  <body>
+    <canvas width="800" height="600"></canvas>
+    <video autoplay></video>
+    <div id="takePhoto" onClick="takePhoto()">
+      <i class="fa fa-camera" aria-hidden="true"></i>
+    </div>
+  </body>
+</html>
+```
+
+Electron handles dialog windows differently than NW.js.
+
+The dependencies in the app.js file:
+```javascript
+'use strict';
+
+const electron = require('electron');
+const dialog = electron.remote.dialog;
+const fs = require('fs');
+let photoData;
+let video;
+
+function savePhoto(filePath) {
+  if (filePath) {
+    fs.writeFile(filePath, photoData, 'base64', (err) => {
+      if (err) {
+        alert(`There was a problem saving the photo: ${err.message}`);
+      }
+      photoData = null;
+    });
+  }
+}
+```
+
+The app.js file's initialize function:
+```javascript
+function initialize() {
+  video = window.document.querySelector('video');
+  let errorCallback = (error) => {
+    console.log(`There was an error connecting to the video stream: ${error.message}`);
+  };
+  window.navigator.webkitGetUserMedia({ video: true }, (localMediaStream) => {
+    video.src = window.URL.createObjectURL(localMediaStream);
+  }, errorCallback);
+}
+```
+
+Finally, let's take a look at the takePhoto function and the window.onload event binding that makes up the rest of the app.js file.
+```javascript
+function takePhoto() {
+  let canvas = window.document.querySelector('canvas');
+  canvas.getContext('2d').drawImage(video, 0, 0, 800, 600);
+  photoData = canvas.toDataURL('image/png').replace(/^data:image\/(png|jpg|jpeg);base64,/, '');
+  dialog.showSaveDialog({
+    title: "Save the photo",
+    defaultPath: 'myfacebomb.png',
+    buttonLabel: 'Save photo'
+  }, savePhoto);
+}
+window.onload = initialize;
+```
