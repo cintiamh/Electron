@@ -5,6 +5,7 @@
 * [Creating application and context menus](#creating-application-and-context-menus)
 * [Dragging and dropping files and crafting the UI](#dragging-and-dropping-files-and-crafting-the-ui)
 * [Using a webcam in your application](#using-a-webcam-in-your-application)
+* [Storing app data](#storing-app-data)
 
 # Controlling how your desktop app is displayed
 
@@ -813,3 +814,5 @@ window.onload = initialize;
 The `takePhoto` function directly triggers the rendering of the Save File dialog window.
 
 https://electron.atom.io/docs/api/dialog/
+
+# Storing app data
