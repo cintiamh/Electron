@@ -7,6 +7,8 @@
 * [Using a webcam in your application](#using-a-webcam-in-your-application)
 * [Storing app data](#storing-app-data)
 * [Copying and pasting contents from the clipboard](#copying-and-pasting-contents-from-the-clipboard)
+* [Binding on keyboard shortcuts](#binding-on-keyboard-shortcuts)
+* [Making desktop notifications](#making-desktop-notifications)
 
 # Controlling how your desktop app is displayed
 
@@ -1083,3 +1085,75 @@ clipboard.writeImage(image);
 clipboard.writeRTF(richText);
 clipboard.writeHTML(html);
 ```
+
+# Binding on keyboard shortcuts
+
+You can use the `document.onkeydown` event to listen for keystrokes in an app, as you would in a web page.
+
+## Creating Global shortcuts with Electron
+
+The `globalShortcut` API is available from the main process in Electron, so you require it from the main.js file and then use it to register a keyboard shortcut.
+
+Once the module is required, you're able to add and remove keyboard shortcuts by calling the register and unregister API methods.
+
+Electron is smart enough to detect which OS the app is running on and use the appropriate keyboard shortcut (Command or Ctrl).
+
+```javascript
+'use strict';
+const { app, globalShortcut, BrowserWindow } = require('electron');
+let mainWindow = null;
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('ready', () => {
+  mainWindow = new BrowserWindow({
+    width: 840,
+    height: 470,
+    userContentSize: true,
+  });
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.on('closed', () => { mainWindow = null; });
+  // Registers the keyboard shortcut
+  const pauseKey = globalShortcut.register('CommandOrControl+P', () => {
+    // emits event to app window
+    mainWindow.webContents.send('togglePauseState');
+  });
+  // If you couldn't register keyboard shortcut, alerts user
+  if (!pauseKey) alert('You will not be able to pause the game from the keyboard')
+});
+
+app.on('will-quit', () => {
+  globalShortcut.unregister('CommandOrControl+P');
+})
+```
+
+We are going to use the webContents module to send a message to the app.js window so the message can be received by the renderer process and acted on.
+
+```javascript
+const ipcRenderer = require('electron').ipcRenderer;
+
+// Function to trigger when keyboard shortcut is pressed
+function togglePauseState() {
+  if (currentState) {
+    if (currentState === 'play') {
+      pause();
+      currentState = 'pause';
+    } else {
+      play();
+      currentState = 'play';
+    }
+  } else {
+    pause();
+    currentState = 'play';
+  }
+}
+
+// When message with event name 'togglePauseState' is received, triggers that function.
+ipcRenderer.on('togglePauseState', togglePauseState);
+```
+
+Learn more: https://electron.atom.io/docs/api/global-shortcut/
+
+# Making desktop notifications
