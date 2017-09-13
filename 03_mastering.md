@@ -6,6 +6,7 @@
 * [Dragging and dropping files and crafting the UI](#dragging-and-dropping-files-and-crafting-the-ui)
 * [Using a webcam in your application](#using-a-webcam-in-your-application)
 * [Storing app data](#storing-app-data)
+* [Copying and pasting contents from the clipboard](#copying-and-pasting-contents-from-the-clipboard)
 
 # Controlling how your desktop app is displayed
 
@@ -931,4 +932,154 @@ The index.html file content:
     <textarea onKeyUp="saveNotes();"></textarea>
   </body>
 </html>
+```
+
+# Copying and pasting contents from the clipboard
+
+## Accessing the clipboard
+
+The clipboard API in Electron allow you to store and retrieve text-based data to and from the clipboard.
+
+### Creating a Pearls app with Electron
+
+```
+$ mkdir pearls-electron
+$ cd pearls-electron
+$ npm init -y
+$ npm i electron --save
+$ touch main.js
+$ touch index.html
+$ touch app.css
+$ touch app.js
+$ touch phrases.js
+```
+
+package.json file content:
+```json
+{
+  "name": "pearls-electron",
+  "version": "1.0.0",
+  "description": "A clipboard API example for Electron and the book 'Cross Platform Desktop apps'",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["electron", "clipboard"],
+  "author": "Cintia Higashi",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.7.6"
+  }
+}
+```
+
+The main.js file content is pretty standard:
+```javascript
+'use strict';
+
+const electron = require('electron');
+const app = electron. app;
+const BrowserWindow = electron.BrowserWindow;
+
+let mainWindow = null;
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('ready', () => {
+  mainWindow = new BrowserWindow({
+    width: 670,
+    height: 550,
+    useContentSize: true
+  });
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.on('closed', () => { mainWindow = null; });
+});
+```
+
+index.html file content:
+```html
+<html>
+  <head>
+    <title>Pearls</title>
+    <link href="app.css" rel="stylesheet" />
+    <script src=" app.js"></script>
+  </head>
+  <body>
+    <template id="phrase">
+      <div class="phrase" onclick="copyPhraseToClipboard(this.innerText);"></div>
+    </template>
+    <div id="phrases"></div>
+  </body>
+</html>
+```
+
+And finally the app.js file:
+```javascript
+'use strict';
+
+const electron = require('electron');
+// Loads Electron's clipboard API
+const clipboard = electron.clipboard;
+const phrases = require('./phrases');
+
+let phrasesArea;
+let template;
+
+function addPhrase(phrase) {
+  template.content.querySelector('div').innerText = phrase;
+  let clone = window.document.importNode(template.content, true);
+  phrasesArea.appendChild(clone);
+}
+
+function loadPhrasesInto() {
+  phrasesArea = window.document.getElementById('phrases');
+  template = window.document.querySelector('#phrase');
+  phrases.forEach(addPhrase);
+}
+
+function copyPhraseToClipboard(phrase) {
+  clipboard.writeText(phrase);
+}
+
+window.onload = loadPhrasesInto;
+```
+
+To put some text content in the clipboard:
+```javascript
+clipboard.writeText(phrase);
+```
+
+To read the content in the clipboard:
+```javascript
+const content = clipboard.readText();
+```
+
+To clear the clipboard's content:
+```javascript
+clipboard.clear();
+```
+
+### Setting other types of content to the clipboard with Electron
+
+https://electron.atom.io/docs/api/clipboard/
+
+* Text
+* HTML
+* Images
+* RTF
+
+```javascript
+const electron = require('electron');
+const clipboard = electron.clipboard;
+
+let image = clipboard.readImage();
+let richText = clipboard.readRTF();
+let html = clipboard.readHTML();
+
+clipboard.writeImage(image);
+clipboard.writeRTF(richText);
+clipboard.writeHTML(html);
 ```

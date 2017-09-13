@@ -1,0 +1,16 @@
+{
+  "name": "pearls-electron",
+  "version": "1.0.0",
+  "description": "A clipboard API example for Electron and the book 'Cross Platform Desktop apps'",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["electron", "clipboard"],
+  "author": "Cintia Higashi",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.7.6"
+  }
+}
